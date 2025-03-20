@@ -1,28 +1,28 @@
-// server.js
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const axios = require('axios');
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
 
+// Charger les variables d'environnement
+dotenv.config();
+
+// Créer l'instance Express
+const app = express();
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
 
 // Connexion à MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connecté à MongoDB !"))
-  .catch(err => console.error("Échec de connexion à MongoDB :", err));
+connectDB();
 
+// Routes
+app.use('/api/news', require('./routes/news'));
+app.use('/api/history', require('./routes/history'));
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connecté à MongoDB !"))
-  .catch(err => console.error("Échec de connexion à MongoDB :", err));
-
-  const newsAPI = axios.create({
-    baseURL: "https://newsapi.org/v2",
-    params: { apiKey: process.env.NEWSAPI_KEY }
-  });
-  
-  // Testez une requête
-  newsAPI.get("/everything?q=technology&language=fr")
-    .then(response => console.log("NewsAPI fonctionne !", response.data.articles[0]))
-    .catch(err => console.error("Erreur NewsAPI :", err.message));
+// Démarrage du serveur
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
+});
