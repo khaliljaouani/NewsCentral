@@ -1,37 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
+import './SearchFilters.css';
 
-const SearchFilters = ({ onSearch }) => {
-  const [filters, setFilters] = useState({
-    keyword: '',
-    category: 'general'
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSearch(filters);
-  };
-
+const SearchFilters = ({ filters, onChange }) => {
   return (
-    <form onSubmit={handleSubmit} className="search-form">
+    <div className="filters-container">
       <input
         type="text"
-        placeholder="Rechercher des articles..."
+        placeholder="Mot-clé..."
+        name="keyword"
         value={filters.keyword}
-        onChange={(e) => setFilters({...filters, keyword: e.target.value})}
+        onChange={onChange}
       />
-      
-      <select
-        value={filters.category}
-        onChange={(e) => setFilters({...filters, category: e.target.value})}
-      >
-        <option value="general">Général</option>
+
+      <select name="category" value={filters.category} onChange={onChange}>
+        <option value="">Catégorie</option>
         <option value="business">Business</option>
+        <option value="health">Santé</option>
+        <option value="sport">Sport</option>
+        <option value="science">Science</option>
+        <option value="media">Média</option>
         <option value="technology">Technologie</option>
-        <option value="sports">Sports</option>
       </select>
 
-      <button type="submit">Rechercher</button>
-    </form>
+      <input
+        type="date"
+        name="fromDate"
+        value={filters.fromDate}
+        onChange={onChange}
+      />
+      <input
+        type="date"
+        name="toDate"
+        value={filters.toDate}
+        onChange={onChange}
+      />
+
+      <select name="source" value={filters.source} onChange={onChange}>
+        <option value="all">Toutes les sources</option>
+        <option value="newsapi">NewsAPI</option>
+        <option value="gnews">GNews</option>
+        <option value="nytimes">NYTimes</option>
+      </select>
+
+      <select name="popularity" value={filters.popularity} onChange={onChange}>
+        <option value="">Popularité</option>
+        <option value="publishedAt">Date</option>
+        <option value="popularity">Popularité</option>
+        <option value="relevancy">Pertinence</option>
+      </select>
+    </div>
   );
 };
 
