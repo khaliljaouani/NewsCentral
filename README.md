@@ -22,7 +22,31 @@ News Central est une application fullstack MERN (MongoDB, Express.js, React.js, 
 ##  Configuration backend
 
 1. Crée un fichier `.env` (inspiré de `.env.example`)
-2. Installe les dépendances :
-```bash
+
+
 cd backend
 npm install
+npm install express mongoose axios dotenv moment cors
+
+
+cd ../frontend
+npm install
+npm install react-router-dom axios
+
+
+
+
+🧪 Tests fonctionnels
+✅ Recherche avec et sans mot-clé
+✅ Filtres combinés et indépendants
+✅ Pagination (4 articles/page)
+✅ Historique consultable et relançable
+✅ Comportement réactif même si une API échoue ou atteint sa limite
+
+🌐 Sources API utilisées
+NewsAPI
+
+GNews
+
+New York Times
+
