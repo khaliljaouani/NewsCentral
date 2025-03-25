@@ -1,63 +1,46 @@
 const axios = require('axios');
-
-
-const categoryKeywords = {
-  business: ['business', 'economy', 'finance', 'stock', 'market'],
-  health: ['health', 'covid', 'hospital', 'vaccine', 'disease'],
-  media: ['media', 'tv', 'cinema', 'series', 'netflix', 'radio'],
-  science: ['science', 'research', 'space', 'discovery'],
-  sport: ['sport', 'football', 'soccer', 'match', 'olympic', 'game'],
-  technology: ['technology', 'tech', 'AI', 'robot', 'software', 'hardware']
-};
-
-
-const guessCategory = (article) => {
-  const text = `${article.title} ${article.description} ${article.content}`.toLowerCase();
-  for (const [category, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(word => text.includes(word))) {
-      return category;
-    }
-  }
-  return 'general'; 
-};
+const moment = require('moment');
 
 const getNewsFromNewsAPI = async (filters) => {
+  const { keyword, category, fromDate, toDate, popularity } = filters;
+
+  if (!keyword && !category && !fromDate && !toDate && !filters.source) return [];
+
+  const query = (keyword && keyword.trim()) || (category && category.trim()) || '';
+
+  const params = {
+    q: query,
+    apiKey: process.env.NEWSAPI_KEY,
+    language: 'fr',
+    pageSize: 20
+  };
+
+  if (fromDate && moment(fromDate).isSameOrAfter('2025-02-21')) {
+    params.from = fromDate;
+  }
+  if (toDate) {
+    params.to = toDate;
+  }
+  if (popularity) {
+    params.sortBy = popularity;
+  }
+
+  console.log("📤 NewsAPI Filters utilisés :", filters);
+
   try {
-    const { keyword, fromDate, toDate, popularity, category } = filters;
+    const res = await axios.get('https://newsapi.org/v2/everything', { params });
+    const articles = res.data.articles || [];
 
-    let url = `https://newsapi.org/v2/everything?q=${keyword || ''}&apiKey=${process.env.NEWSAPI_KEY}`;
-    if (fromDate) url += `&from=${fromDate}`;
-    if (toDate) url += `&to=${toDate}`;
-    if (popularity) url += `&sortBy=${popularity}`; 
-
-    
-    const response = await axios.get(url);
-    const articles = response.data.articles || [];
-    const normalized = articles.map(article => {
-      const normalizedArticle = {
-        title: article.title || '',
-        description: article.description || '',
-        url: article.url,
-        source: 'NewsAPI',
-        image: article.urlToImage || 'https://via.placeholder.com/300x200?text=No+Image',
-        publishedAt: article.publishedAt || '',
-        content: article.content || ''
-      };
-
-  
-      normalizedArticle.category = guessCategory(normalizedArticle);
-
-      return normalizedArticle;
-    });
-
-    const finalArticles = category
-      ? normalized.filter(article => article.category === category)
-      : normalized;
-
-    return finalArticles;
-
-  } catch (error) {
-    console.error('❌ Error fetching NewsAPI:', error.message);
+    return articles.map(a => ({
+      title: a.title,
+      description: a.description,
+      url: a.url,
+      image: a.urlToImage || '',
+      source: a.source.name || 'NewsAPI',
+      publishedAt: a.publishedAt
+    }));
+  } catch (err) {
+    console.error('❌ Error fetching NewsAPI:', err.response?.data || err.message);
     return [];
   }
 };
