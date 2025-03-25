@@ -1,4 +1,3 @@
-// ✅ pages/HomePage.jsx (version finale avec protections & debounce)
 import React, { useEffect, useState, useRef } from 'react';
 import SearchFilters from '../components/SearchFilters';
 import ArticleCard from '../components/ArticleCard';
@@ -32,7 +31,6 @@ const HomePage = () => {
       newFilters[key] = params.get(key);
     }
     setFilters(newFilters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
   // ✅ Requête automatique avec debounce (uniquement si filtres valides)
